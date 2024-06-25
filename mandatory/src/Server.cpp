@@ -624,9 +624,8 @@ Client*	Server::getMember(std::string nickname)
 channel* Server::getChannel(std::string channelName)
 {
 	std::map<std::string, channel*>::iterator Channel;
-
-	Channel = this->channels.begin();
-	for (Channel; Channel != channels.end(); Channel++)
+    
+	for (Channel = this->channels.begin(); Channel != channels.end(); Channel++)
 	{
 		if (Channel->first == channelName)
 			return (Channel->second);
