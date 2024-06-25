@@ -16,13 +16,13 @@ enum ClientState{
 
 class Client{
     private:
-        int fd;
-        int port;
-        ClientState state;
         std::string hostname;
         std::string username;
         std::string nickname;
         std::string realname;
+        int port;
+        int fd;
+        ClientState state;
 		std::vector<channel*>	invitingChannels; // the channels that invited the client (used in invite command)
 
     public:

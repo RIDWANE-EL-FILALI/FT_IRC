@@ -19,7 +19,7 @@ CommandHandler::~CommandHandler(){
 }
 
 void CommandHandler::handleCommand(std::string command, Client *client) {
-    std::cout << "--> " << command << std::endl;
+    // std::cout << "--> " << command << std::endl;
     std::stringstream ss(command);
     std::string cmd;
 

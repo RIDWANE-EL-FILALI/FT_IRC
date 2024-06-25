@@ -14,7 +14,7 @@ void Topic::run(Client* client, std::list<std::string> args)
 {
 	channel*	Channel;
 	std::string	Topic;
-	time_t		setTime;
+	time_t		setTime = 0;
 
 	if (args.empty() || *args.begin() == "TOPIC")
 	{

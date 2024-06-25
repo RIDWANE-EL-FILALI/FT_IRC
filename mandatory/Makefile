@@ -1,4 +1,4 @@
-CPPFLAGS = -std=c++98
+CPPFLAGS =  -std=c++98
 CC = g++
 NAME = ircserv
 PREFIX = ./obj/
