@@ -529,7 +529,7 @@ bool Server::setOperatorChannel(std::string channelName, std::string targetClien
 		std::cout << "OPERATOR LIST : " << std::endl << "------------" << std::endl;
 		//print all operators
 		{
-			for (auto it = _channel->second->getOperators().begin(); it != _channel->second->getOperators().end(); ++it)
+			for (std::vector<std::string>::iterator it = _channel->second->getOperators().begin(); it != _channel->second->getOperators().end(); ++it)
 			{
 				std::cout << *it << std::endl;
 			}
@@ -624,7 +624,7 @@ Client*	Server::getMember(std::string nickname)
 channel* Server::getChannel(std::string channelName)
 {
 	std::map<std::string, channel*>::iterator Channel;
-    
+
 	for (Channel = this->channels.begin(); Channel != channels.end(); Channel++)
 	{
 		if (Channel->first == channelName)

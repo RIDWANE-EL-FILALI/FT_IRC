@@ -158,7 +158,7 @@ void channel::addInvite(Client *client, Client *invitedClient)
 		invitedClient->addInvitingChannel(this);
 		client->reply(Replies::RPL_INVITING(this->name, client, invitedClient, 1));
 		invitedClient->reply(Replies::RPL_INVITING(this->name, client, invitedClient, 0));
-		for(auto it = invitedMembers.begin(); it != invitedMembers.end(); it++)
+		for(std::vector<std::string>::iterator it = invitedMembers.begin(); it != invitedMembers.end(); it++)
 			std::cout << *it << std::endl;
 	}
 }
