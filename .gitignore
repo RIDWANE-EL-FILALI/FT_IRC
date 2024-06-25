@@ -1,0 +1,5 @@
+.vscode/*
+script.sh
+obj/*
+.dist/*
+.dist
