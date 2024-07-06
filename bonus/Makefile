@@ -22,6 +22,7 @@ SOURCE = src/commands/Nick.cpp \
          src/commands/Mode.cpp \
          src/commands/Invite.cpp \
          src/commands/Topic.cpp \
+         src/commands/Weather.cpp \
          src/Client.cpp \
          src/CommandHandler.cpp \
          src/Replies.cpp \

@@ -12,6 +12,7 @@ CommandHandler::CommandHandler(Server *server): server(server) {
 	_commands["MODE"] = new Mode(server);
 	_commands["INVITE"] = new Invite(server);
 	_commands["TOPIC"] = new Topic(server);
+    _commands["WEATHER"] = new Weather(server);
 }
 
 CommandHandler::~CommandHandler(){

@@ -97,4 +97,11 @@ class Topic : public Command{
 		void run(Client* client, std::list<std::string> args);
 };
 
+class Weather : public Command{
+    public:
+        Weather(Server *server);
+        ~Weather();
+        void run(Client* client, std::list<std::string> args);
+};
+
 #endif

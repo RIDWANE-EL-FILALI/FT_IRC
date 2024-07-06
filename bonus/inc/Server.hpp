@@ -73,6 +73,7 @@ class Server{
 		std::map<std::string, channel *>	getChannels();
 		channel*							getChannel(std::string channelName);
 		Client*								getMember(std::string nickname);
+        Client*								getClientByNickname(std::string nickname);
 };
 
 #endif
