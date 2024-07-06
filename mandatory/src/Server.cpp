@@ -357,8 +357,6 @@ void Server::partUser(std::string channelName, Client *client, Server *server, s
         client->reply(Replies::ERR_NOTONCHANNEL(client->getNickname(), channelName));
         return ;
     }
-    //handle case were the user is the last one in the channel
-    //handle case where the user is the creator of the channel
     std::string sender = client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
     if (channel->getCreator() == sender)
     {
@@ -381,7 +379,9 @@ void Server::partUser(std::string channelName, Client *client, Server *server, s
         channel->getMembers().erase(client->getNickname());
     }
     else
+    {
         channel->getMembers().erase(client->getNickname());
+    }
     client->reply(":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " PART " + channelName + " :" + comment);
     for(std::map<std::string, Client *>::iterator it = channel->getMembers().begin(); it != channel->getMembers().end(); it++)
     {
@@ -390,18 +390,21 @@ void Server::partUser(std::string channelName, Client *client, Server *server, s
 }
 
 void Server::quitUser(Client *client, std::string message, Server *server) {
-
     for (std::map<std::string, channel *>::iterator it = server->channels.begin(); it != server->channels.end(); it++)
     {
         if (it->second->isMember(client->getNickname()) == true)
         {
             partUser(it->first, client, server, message);
+            std::string sender = client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
+            if (it->second->getCreator() == sender || server->channels.size() == 0)
+                break;
         }
     }
     client->reply(":ircserv.localhost 301 " + client->getNickname() + " :You have quit IRC");
     close(client->getFd());
     server->_clients.erase(client->getFd());
     std::cout << "client " << client->getNickname() << " has quit" << std::endl;
+    return ;
 }
 
 

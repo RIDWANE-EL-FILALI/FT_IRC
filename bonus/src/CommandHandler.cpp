@@ -12,7 +12,6 @@ CommandHandler::CommandHandler(Server *server): server(server) {
 	_commands["MODE"] = new Mode(server);
 	_commands["INVITE"] = new Invite(server);
 	_commands["TOPIC"] = new Topic(server);
-    _commands["DDD"] = new DDD(server);
 }
 
 CommandHandler::~CommandHandler(){
@@ -20,6 +19,9 @@ CommandHandler::~CommandHandler(){
 }
 
 void CommandHandler::handleCommand(std::string command, Client *client) {
+    if (command[0] == ':')
+        command = command.substr(1);
+    std::cout << "Command: " << command << std::endl;
     // std::cout << "--> " << command << std::endl;
     std::stringstream ss(command);
     std::string cmd;

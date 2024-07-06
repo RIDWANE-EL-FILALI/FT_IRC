@@ -62,7 +62,6 @@ class Server{
         void broadcast_kick(std::string channelName, Client *client, std::string nickname, Server *server, std::string comment);
         void partUser(std::string channelName, Client *client, Server *server, std::string comment);
         void quitUser(Client *client, std::string message, Server *server);
-        void transfer_file(std::string client_name, std::string file_path);
 
 		bool setInviteOnlyChannel(std::string channelName, Client* client, bool adding);
 		bool setTopicRestrictedChannel(std::string channelName, bool adding, Client *client);

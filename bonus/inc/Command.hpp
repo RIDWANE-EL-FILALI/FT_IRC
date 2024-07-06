@@ -97,11 +97,4 @@ class Topic : public Command{
 		void run(Client* client, std::list<std::string> args);
 };
 
-class DDD : public Command{
-	public:
-		DDD(Server *server);
-		~DDD();
-		void run(Client* client, std::list<std::string> args);
-};
-
 #endif
