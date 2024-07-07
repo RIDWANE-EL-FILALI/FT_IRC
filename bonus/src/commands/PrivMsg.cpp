@@ -32,7 +32,6 @@
 			}
 			message += " " + *it;
 		}
-		std::cout << "Message: " << message << std::endl;
 		for (std::list<std::string>::iterator channelIter = channelList.begin(); channelIter != channelList.end(); ++channelIter) {
 			std::string channelName = *channelIter;
 

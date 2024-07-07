@@ -22,6 +22,7 @@ SOURCE = src/commands/Nick.cpp \
          src/commands/Mode.cpp \
          src/commands/Invite.cpp \
          src/commands/Topic.cpp \
+         src/commands/Weather.cpp \
          src/Client.cpp \
          src/CommandHandler.cpp \
          src/Replies.cpp \
@@ -42,35 +43,35 @@ COLOR = \033[1;32m
 RESET = \033[0m
 RED = \033[1;31m\033[1m
 
-.PHONY: all run clean fclean re banner
 
-all: banner run
+all: banner $(NAME)
 
 banner:
 	@echo "$(COLOR)$(ASCII)$(RESET)"
 
-run: $(NAME)
-	@echo "Running with password: $(RED)pass$(RESET)"
-	@./$(NAME) 9001 pass
-
 $(PREFIX):
 	@mkdir -p $(PREFIX)src/commands
-	@echo "Creating directories..."
+	@echo "$(COLOR)Creating obj directory...$(RESET)"
 
+# create the executable file
 $(NAME): $(PREFIX) $(OBJECT)
-	@echo "Building $(NAME)..."
+	@echo "$(COLOR)Building $(NAME)$(RESET)"
 	@$(CC) $(CPPFLAGS) $(OBJECT) -o $(NAME)
-	@echo "$(COLOR)Build complete!$(RESET)"
+	@echo "$(COLOR)Build complete ✅$(RESET)"
 
 $(PREFIX)%.o: %.cpp $(HEADERS)
 	@$(CC) $(CPPFLAGS) -c $< -o $@
 
+run_irc:
+	@./$(NAME) 9001 Pass
 clean:
-	@echo "Cleaning up..."
+	@echo "$(COLOR)Cleaning...$(RESET)"
 	@rm -rf $(PREFIX)
-	@rm -f $(OBJECT)
+	@rm -f $(OBJECT) 
+	@echo "$(COLOR)Clean complete ✅$(RESET)"
 
 fclean: clean
 	@rm -f $(NAME)
 
-re: fclean run
+re: fclean all
+.PHONY: all run clean fclean re banner

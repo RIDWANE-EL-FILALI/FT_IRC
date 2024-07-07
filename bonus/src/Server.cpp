@@ -105,7 +105,6 @@ void Server::start(std::string pass){
     _pollfds.push_back(serverfd);
 
     std::cout << "server is on " << this->port << std::endl;
-
     while(true)
     {
         if (poll(_pollfds.data(), _pollfds.size(), -1) == -1) {

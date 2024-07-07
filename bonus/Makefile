@@ -1,6 +1,7 @@
 CPPFLAGS =  -std=c++98
 CC = g++
 NAME = ircserv
+BOT_NAME = Weather_bot
 PREFIX = ./obj/
 ASCII = \n\
 ██╗██████╗  ██████╗███████╗███████╗██████╗ ██╗   ██╗\n\
@@ -38,40 +39,56 @@ HEADERS = inc/Client.hpp \
           inc/Server.hpp
 
 OBJECT = $(addprefix $(PREFIX), $(SOURCE:.cpp=.o))
+BOT_SOURCE = bot/main.cpp
+BOT_OBJECT = $(addprefix $(PREFIX), $(BOT_SOURCE:.cpp=.o))
 
 COLOR = \033[1;32m
 RESET = \033[0m
 RED = \033[1;31m\033[1m
 
-.PHONY: all run clean fclean re banner
 
-all: banner run
+all: banner $(NAME) $(BOT_NAME)
 
 banner:
 	@echo "$(COLOR)$(ASCII)$(RESET)"
 
-run: $(NAME)
-	@echo "Running with password: $(RED)pass$(RESET)"
-	@./$(NAME) 9001 pass
-
 $(PREFIX):
 	@mkdir -p $(PREFIX)src/commands
-	@echo "Creating directories..."
+	@mkdir -p $(PREFIX)bot
+	@echo "$(COLOR)Creating obj directory...$(RESET)"
 
+# create the executable file
 $(NAME): $(PREFIX) $(OBJECT)
-	@echo "Building $(NAME)..."
+	@echo "$(COLOR)Building $(NAME)$(RESET)"
 	@$(CC) $(CPPFLAGS) $(OBJECT) -o $(NAME)
-	@echo "$(COLOR)Build complete!$(RESET)"
+	@echo "$(COLOR)Build complete ✅$(RESET)"
+
+$(BOT_NAME): $(PREFIX) $(BOT_OBJECT)
+	@echo "$(COLOR)Building $(BOT_NAME)$(RESET)"
+	@$(CC) $(CPPFLAGS) $(BOT_OBJECT) -o $(BOT_NAME)
+	@echo "$(COLOR)Bot build complete ✅$(RESET)"
 
 $(PREFIX)%.o: %.cpp $(HEADERS)
 	@$(CC) $(CPPFLAGS) -c $< -o $@
 
+$(PREFIX)bot/%.o: bot/%.cpp $(HEADERS)
+	@mkdir -p $(@D)
+	@$(CC) $(CPPFLAGS) -c $< -o $@
+
+run_irc:
+	@./$(NAME) 9001 Pass
+
+run_bot:
+	@./$(BOT_NAME) localhost 9001 Pass
+
 clean:
-	@echo "Cleaning up..."
+	@echo "$(COLOR)Cleaning...$(RESET)"
 	@rm -rf $(PREFIX)
-	@rm -f $(OBJECT)
+	@rm -f $(OBJECT) $(BOT_OBJECT)
+	@echo "$(COLOR)Clean complete ✅$(RESET)"
 
 fclean: clean
-	@rm -f $(NAME)
+	@rm -f $(NAME) $(BOT_NAME) 
 
-re: fclean run
+re: fclean all
+.PHONY: all run clean fclean re banner

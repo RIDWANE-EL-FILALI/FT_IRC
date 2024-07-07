@@ -8,15 +8,24 @@ Weather::~Weather() {
 
 
 void Weather::run(Client* client, std::list<std::string> args) {
+    if (args.empty()) {
+        client->reply(Replies::ERR_NEEDMOREPARAMS("WEATHER"));
+        return;
+    }
+    if (args.size() > 1)
+    {
+        client->reply(Replies::ERR_NEEDMOREPARAMS("WEATHER"));
+        return;
+    }
+
     std::string city = args.front();
-    
-    std::cout << "trying to fetch weather for " << city << std::endl;
     Client *c = server->getClientByNickname("bot");
     if (c) {
-        c->reply("PING");
+        std::cout << "fetching weather for " << city << std::endl;
+        c->reply("WEATHER " + client->getNickname() + " " + city);
     }
     else
-        client->reply("No bot found.");
+        client->reply("The bot is not connected.");
     return ;
 }
     
