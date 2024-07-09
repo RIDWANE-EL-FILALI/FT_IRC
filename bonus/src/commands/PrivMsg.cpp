@@ -32,6 +32,7 @@
 			}
 			message += " " + *it;
 		}
+		message.erase(0, message.find_first_not_of(' '));
 		for (std::list<std::string>::iterator channelIter = channelList.begin(); channelIter != channelList.end(); ++channelIter) {
 			std::string channelName = *channelIter;
 

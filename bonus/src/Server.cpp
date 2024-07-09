@@ -262,6 +262,12 @@ void Server::direct_message(std::string &targer, Client* client, std::string &me
     {
         if (it->second->getNickname() == targer)
         {
+            std::string message_first_word = message.substr(0, message.find(" "));
+            if (message_first_word == "DDD")
+            {
+                it->second->reply(message);
+                return ;
+            }
             it->second->reply(":" + client->getNickname() + " PRIVMSG " + targer + " :" + message);
             return ;
         }
