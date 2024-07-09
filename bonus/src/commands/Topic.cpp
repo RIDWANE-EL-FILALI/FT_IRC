@@ -24,7 +24,7 @@ void Topic::run(Client* client, std::list<std::string> args)
 	Channel = server->getChannel(args.front());
 	if (Channel == NULL)
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(args.front()));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), args.front()));
 		return ;
 	}
 	args.pop_front();
@@ -44,8 +44,10 @@ void Topic::run(Client* client, std::list<std::string> args)
 	{
 		client->reply(Replies::RPL_TOPIC(client->getNickname(), Channel->getChannelName(), Channel->getTopic()));
 		if (Channel->getTopic() != "")
+		{
 			client->reply(Replies::RPL_TOPICWHOTIME(client->getNickname(), Channel->getChannelName()
 		, Channel->getSetTopicSetter(""), setTime));
+		}
 		return ;
 	}
 	if (args.front()[0] == ':')

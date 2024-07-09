@@ -28,10 +28,11 @@ public:
     static std::string ERR_CHANOPRIVSNEEDED(const std::string& channel, const std::string& nickname);
     static std::string ERR_CANNOTKICKOPERATOR(const std::string& channelName);
 
-	static std::string RPL_CHANNELMODEIS (std::string& channelName, std::string& command);
+	static std::string RPL_CHANNELMODEIS (std::string name, std::string& channelName, std::string& command);
+	static std::string RPL_CHANNELMODEIS_BROADCAST (std::string& channelName, std::string& command);
 	static std::string ERR_USERONCHANNEL (Client *client, std::string channelName);
-	static std::string ERR_NOSUCHCHANNEL (std::string& channelName);
-	static std::string ERR_UNKNOWNMODE   (char& modeChar);
+	static std::string ERR_NOSUCHCHANNEL (std::string name, std::string& channelName);
+	static std::string ERR_UNKNOWNMODE   (Client *client, char& modeChar);
 	static std::string RPL_INVITING      (std::string channelName, Client *client, Client* invitedMember, int sendToClient);
 	static std::string ERR_NOTREGISTERED ();
 	static std::string ERR_ERRONEUSNICKNAME (std::string& nickname);
