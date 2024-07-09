@@ -184,7 +184,7 @@ void Server::joinChannel(std::string& channelName, Client* client, std::string& 
         client->reply(Replies::ERR_CHANNELISFULL(channelName));
         return;
     }
-    if (channel->getInviteOnly() && !channel->isMember(client->getNickname())) {
+    if (channel->getInviteOnly() && !channel->isMember(client->getNickname()) && channel->getInvitedMember(client->getNickname()) == false){
         client->reply(Replies::ERR_INVITEONLYCHAN(channelName));
         return;
     }
@@ -650,4 +650,13 @@ Client *Server::getClientByNickname(std::string nickname)
             return it->second;
     }
     return NULL;
+}
+
+bool channel::getInvitedMember(std::string name) {
+    for (std::vector<std::string>::iterator it = invitedMembers.begin(); it != invitedMembers.end(); it++)
+    {
+        if (*it == name)
+            return true;
+    }
+    return false;
 }
