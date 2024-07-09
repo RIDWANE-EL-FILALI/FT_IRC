@@ -529,14 +529,7 @@ bool Server::setOperatorChannel(std::string channelName, std::string targetClien
 			return  (_channel->second->addOperator(_client->getNickname(), client));
 		else
 			return (_channel->second->removeOperator(_client->getNickname(), client));
-		std::cout << "OPERATOR LIST : " << std::endl << "------------" << std::endl;
-		//print all operators
-		{
-			for (std::vector<std::string>::iterator it = _channel->second->getOperators().begin(); it != _channel->second->getOperators().end(); ++it)
-			{
-				std::cout << *it << std::endl;
-			}
-		}
+
 	}
 	return (true);
 }

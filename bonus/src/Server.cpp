@@ -184,7 +184,7 @@ void Server::joinChannel(std::string& channelName, Client* client, std::string& 
         client->reply(Replies::ERR_CHANNELISFULL(channelName));
         return;
     }
-    if (channel->getInviteOnly() && !channel->isMember(client->getNickname()) && channel->getInvitedMember(client->getNickname()) == false){
+    if (channel->getInviteOnly() && !channel->isMember(client->getNickname())) {
         client->reply(Replies::ERR_INVITEONLYCHAN(channelName));
         return;
     }
@@ -262,12 +262,6 @@ void Server::direct_message(std::string &targer, Client* client, std::string &me
     {
         if (it->second->getNickname() == targer)
         {
-            std::string message_first_word = message.substr(0, message.find(" "));
-            if (message_first_word == "DDD")
-            {
-                it->second->reply(message);
-                return ;
-            }
             it->second->reply(":" + client->getNickname() + " PRIVMSG " + targer + " :" + message);
             return ;
         }
@@ -421,7 +415,7 @@ bool Server::setInviteOnlyChannel(std::string channelName, Client* client, bool 
 	it = channels.find(channelName);
 	if (it->second->getChannelName() != channelName)
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(),channelName));
 		return (false);
 	}
 	if (it->second->isOperator(client->getNickname()))
@@ -443,7 +437,7 @@ bool Server::setTopicRestrictedChannel(std::string channelName, bool adding, Cli
 	it = channels.find(channelName);
 	if (it->second->getChannelName() != channelName)
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
 		return (false);
 	}
 	if (it->second->isOperator(client->getNickname()))
@@ -465,7 +459,7 @@ bool Server::setPasswordChannel(std::string channelName, bool adding, std::strin
 	it = channels.find(channelName);
 	if (it->second->getChannelName() != channelName)
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
 		return (false);
 	}
 	if (it->second->isOperator(client->getNickname()))
@@ -488,7 +482,7 @@ bool Server::setUserLimitChannel(std::string channelName, bool adding, std::stri
 	it = channels.find(channelName);
 	if (it->second->getChannelName() != channelName)
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
 		return (false);
 	}
 	_limit = adding ? atoi(limit.c_str()) : -1;
@@ -510,7 +504,7 @@ bool Server::setOperatorChannel(std::string channelName, std::string targetClien
 	_channel = this->getChannels().find(channelName);
 	if (_channel == this->getChannels().end())
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
 		return (false);
 	}
 	_client = _channel->second->getClient(targetClient);
@@ -570,7 +564,7 @@ void Server::replyChannelModIs(std::string channelName, Client *client, std::map
 	}
     // Check if modeReply is still empty, if so, don't prepend "MODE +" to the reply
     if (!modeReply.empty()) {
-        modeReply = "MODE +" + modeReply;
+        // modeReply = "MODE +" + modeReply;
 		for (int i = 0; i < modeReply.size() ; i++)
 		{
 			if (modeReply[i] == 'k' || modeReply[i] == 'l')
@@ -586,7 +580,6 @@ void Server::replyChannelModIs(std::string channelName, Client *client, std::map
 				for (std::vector<std::string>::iterator ops = it->second->getOperators().begin(); 
 				ops != it->second->getOperators().end(); ops++)
 				{
-					std::cout << "OPERATORS ARE :: " + (*ops) << std::endl;
 					if (!it->second->isCreator(it->second->getClient(*ops)))
 						modeReply += " " + *ops;
 				}
@@ -594,7 +587,7 @@ void Server::replyChannelModIs(std::string channelName, Client *client, std::map
 		}
     }
 
-    client->reply(Replies::RPL_CHANNELMODEIS(channelName, modeReply));
+    client->reply(Replies::RPL_CHANNELMODEIS(client->getNickname(), channelName, modeReply));
 }
 
 void Server::broadcastArgsReply(std::string channelName, std::string modeReply, Client *client)
@@ -607,7 +600,7 @@ void Server::broadcastArgsReply(std::string channelName, std::string modeReply, 
 	for (members = it->second->getMembers().begin(); members != it->second->getMembers().end();
 		members++)
 	{	
-		members->second->reply(Replies::RPL_CHANNELMODEIS(channelName, modeReply));
+		members->second->reply(Replies::RPL_CHANNELMODEIS_BROADCAST(channelName, modeReply));
 	}
 }
 
@@ -650,13 +643,4 @@ Client *Server::getClientByNickname(std::string nickname)
             return it->second;
     }
     return NULL;
-}
-
-bool channel::getInvitedMember(std::string name) {
-    for (std::vector<std::string>::iterator it = invitedMembers.begin(); it != invitedMembers.end(); it++)
-    {
-        if (*it == name)
-            return true;
-    }
-    return false;
 }

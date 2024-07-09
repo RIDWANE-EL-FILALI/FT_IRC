@@ -48,7 +48,6 @@ class channel {
         void setTopicRestricted(bool topicRestricted);
         std::string	getCreator();
 		std::string	getChannelName();
-        bool getInvitedMember(std::string name);
 
 		std::vector<std::string>	getInvitedMembers();
 		std::string					getSetTopicSetter(std::string topicSetter);

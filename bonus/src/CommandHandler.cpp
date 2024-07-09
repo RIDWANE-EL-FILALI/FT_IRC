@@ -20,6 +20,7 @@ CommandHandler::~CommandHandler(){
 }
 
 void CommandHandler::handleCommand(std::string command, Client *client) {
+	std::cout << "Command : " << command << std::endl;
     if (command[0] == ':')
         command = command.substr(1);
     std::stringstream ss(command);

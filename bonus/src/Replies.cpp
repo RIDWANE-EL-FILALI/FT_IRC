@@ -81,30 +81,35 @@ std::string Replies::ERR_NOTREGISTERED() {
     return ("localhost 451 : You have not registered");
 }
 
-std::string Replies::RPL_CHANNELMODEIS(std::string& channelName, std::string& command)
+std::string Replies::RPL_CHANNELMODEIS(std::string name, std::string& channelName, std::string& command)
 {
-	return ("localhost 324 : " + channelName + " " + command);
+	return (":localhost 324 " + name + " " + channelName + ((command.empty()) ? "" : " +" + command));
 }
 
-std::string Replies::ERR_NOSUCHCHANNEL(std::string& channelName)
+std::string Replies::RPL_CHANNELMODEIS_BROADCAST(std::string& channelName, std::string& command)
 {
-	return ("localhost 403 : " + channelName + " :No such channel");
+	return (":localhost MODE " + channelName + " " + command);
 }
 
-std::string Replies::ERR_UNKNOWNMODE(char& modeChar)
+std::string Replies::ERR_NOSUCHCHANNEL(std::string name, std::string& channelName)
 {
-	return ("localhost 472 : " + std::string(1, modeChar) + " :is unknown mode char to me");
+	return (":localhost 403 " + name + " " + channelName + " :No such channel");
+}
+
+std::string Replies::ERR_UNKNOWNMODE(Client *client, char& modeChar)
+{
+	return (":localhost 472 " + client->getNickname() + " " + std::string(1, modeChar) + " :is unknown mode char to me");
 }
 
 std::string Replies::ERR_USERONCHANNEL(Client *client, std::string ChannelName)
 {
-	return ("localhost 443 " + client->getNickname() + " " + ChannelName + " ::is already on channel");
+	return (":localhost 443 " + client->getNickname() + " " + ChannelName + " ::is already on channel");
 }
 
 std::string Replies::RPL_INVITING(std::string channelName, Client* client, Client* invitedMember, int sendToClient)
 {
 	if (sendToClient == 1)
-		return ("localhost 341 " + client->getNickname() + " " + invitedMember->getNickname() + " " + channelName + " :Invitation sent");
+		return (":localhost 341 " + client->getNickname() + " " + invitedMember->getNickname() + " " + channelName + " :Invitation sent");
 	else if (sendToClient == 2)
 		return (":localhost 341 " + client->getNickname() + " " + invitedMember->getNickname() + " "+ channelName + " :Invitation has already been sent");
 	else
@@ -113,7 +118,7 @@ std::string Replies::RPL_INVITING(std::string channelName, Client* client, Clien
 
 std::string Replies::ERR_ERRONEUSNICKNAME (std::string& nickname)
 {
-	return ("localhost 432 " + nickname + " :Erroneus nickname");
+	return (":localhost 432 " + nickname + " :Erroneus nickname");
 }
 
 std::string Replies::ERR_USERNOTINCHANNEL (std::string targetClient, std::string channelName)
@@ -129,7 +134,7 @@ std::string Replies::ERR_CANTKICKCREATOR (Client *client, std::string channelNam
 
 std::string Replies::ERR_INVALIDLIMIT (Client *client, std::string channelName)
 {
-	return (":localhost 485 " + client->getNickname() + " " + channelName + ":Channel limit too low");
+	return (":localhost 479 " + client->getNickname() + " " + channelName + " :Cannot set channel limit lower than current number of users");
 }
 
 std::string Replies::ERR_CANTINVITESELF(std::string clientName)
@@ -155,12 +160,15 @@ std::string Replies::RPL_INVITELIST(const std::string& clientNickname, std::vect
 std::string Replies::RPL_TOPIC(std::string clientName, std::string channelName, std::string topic)
 {
 	if (topic == "")
-		return ("localhost 331 " + clientName + " " + channelName + " :No topic is set");
+		return (":localhost 331 " + clientName + " " + channelName + " :No topic is set");
 	else
-		return ("localhost 332 " + clientName + " " + channelName + " :" + topic);
+		return (":localhost 332 " + clientName + " " + channelName + " :Current topic is: " + topic);
 }
 
 std::string Replies::RPL_TOPICWHOTIME(std::string clientName, std::string channelName, std::string topicSetter, time_t setTime)
 {
-	return ("localhost 333 " + clientName + " " + channelName + " " + topicSetter + " " + std::to_string(setTime));
+	return (":localhost 333 " + clientName + " " + channelName + " " + topicSetter + " " + std::to_string(setTime));
 }
+
+
+///gello w=dk jwlo dk

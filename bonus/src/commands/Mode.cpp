@@ -42,7 +42,7 @@ void Mode::run(Client *client, std::list<std::string> args)
 		Channel = server->getChannel(args.front());
 		if (!Channel)
 		{
-			client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+			client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
 			return ;
 		}
 		if (!Channel->isMember(client->getNickname()))
@@ -64,7 +64,7 @@ void Mode::run(Client *client, std::list<std::string> args)
 	}
 	else
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(args.front()));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), args.front()));
 		return ;
 	}
 	{
@@ -152,7 +152,7 @@ void Mode::run(Client *client, std::list<std::string> args)
 			}
 			default :
 			{
-				client->reply(Replies::ERR_UNKNOWNMODE(mode));
+				client->reply(Replies::ERR_UNKNOWNMODE(client, mode));
 				return ;
 			}
 		}

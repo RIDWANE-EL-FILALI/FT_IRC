@@ -1,170 +1,42 @@
-# commands handled by me (JOIN KICK PART PRIVMSG QUIT )
+# Project Issues and Fixes
+
+## Problems to Fix
+
+### INVITE Command ✔️ "MOSTLY DONE"
+The INVITE command implementation is almost complete. It correctly handles sending invitations and ensuring that invited users are added to the `invitedMembers` list for the specified channel. However, there are minor details to refine, such as ensuring that duplicate invitations are not sent and providing appropriate feedback to the inviter if the invitee is already on the invite list or already in the channel.
+
+### MODE Command ✔️ "MOSTLY DONE"
+The MODE command is largely implemented. It manages channel modes and user modes, allowing for the configuration of channel restrictions and user privileges. Remaining tasks include fine-tuning specific mode operations, ensuring modes are properly enforced, and enhancing feedback messages to align with the IRC protocol standards.
+
+### TOPIC Command ❌
+The TOPIC command is currently not implemented. This command allows users to set or view the topic of a channel. Implementation should ensure that only users with the necessary privileges (e.g., channel operators) can change the topic, and that the topic is properly stored and displayed to users who join the channel.
+
+### -o Parameter in MODE Command Should Not Include Creator of the Channel ✔️
+This issue has been resolved. The MODE command has been updated to exclude the channel creator from being affected by the `-o` parameter, which removes operator status. The creator remains an operator by default, and their status is protected from this specific mode change.
+
+### +l Limit User Args Check to be Int and More Than What Already Exists in Channel ✔️
+The issue with the `+l` mode, which sets a user limit for the channel, has been fixed. The implementation now checks that the user-supplied limit is a valid integer and ensures it is greater than the current number of users in the channel. This prevents setting a limit that would immediately exclude existing users.
+
+### User Can Authenticate Just with USER Command, Without Password Nor Nick ❌
+This security issue is yet to be resolved. Currently, a user can authenticate with the USER command alone, bypassing the need for a password or nickname. This violates the typical IRC authentication flow, which requires a valid password and nickname. The fix will involve enforcing stricter checks to ensure both a password and nickname are provided and validated during the authentication process.
+
+### JOIN Check if Client is in InvitedMembers Vector if Channel is Invite Only ❌
+The JOIN command is not currently verifying whether a client is in the `invitedMembers` list for channels that are set to invite-only. This needs to be addressed by modifying the JOIN command logic to include a check that confirms the client is on the invitation list before allowing them to join an invite-only channel.
+
+### Delete Client from InvitedMembers When Joining ❌
+Upon a successful join, the client should be removed from the `invitedMembers` list to prevent them from using the same invitation to rejoin after leaving. This behavior is not yet implemented and needs to be added to ensure proper management of the invitation list and to avoid potential abuses of the invite system.
+
+### Upon joining a channel, the topic should be anounced ❌
 
 
---> authentication : still needs to be tested
---> set nickname: still needs to be tested
---> set username: still needs to be tested
---> join channels:✅
---> send and receive public and private messages using the reference client:✅
-
---> messages have to be forwarded to every client on the channel:
---> we must have operators and regular users in a channel:✅
+### Topic Command Issues ✔️
+when topic is set with a `':'`, it ignores spaces, 
+the topic reply doesn't include the topicSetter, 
+the topic reply time Set is not right 100%, 
+SPACE AFTER `":"` IN TOPIC MESSAGE SHOULD BE REMOVED, 
+broadcasting the message to clients result a `broken pipe error`.``
 
 
---> commands specific to channels :
-	- PART:✅
-	- PRIVMSG:✅
-	- QUIT: ✅
-	- KICK :✅
-	- INVITE:✅
-	- TOPIC:✅
-	- MODE: ✅
-		-i: Set/remove Invite-only channel
-		-t: Set/remove the restrictions of the TOPIC command to channel
-			operators
-		-k: Set/remove the channel key (password)
-		-o: Give/take channel operator privilege
-		-l: Set/remove the user limit to channel
 
-
-the client used in our case is the native to macos irc client limechat so the responses have to follow the order of the limechat client :
-
-
-# KICK COMMAND :
-The `KICK` command is used to remove a user from a channel.
-```c++
-/KICK <channel> <user> [<comment>]
-```
-### EXAMPLES : 
-```c++
-/KICK #chatroom JohnSpammer "Spamming is not allowed"
-
-//This command removes the user `JohnSpammer` from the `#chatroom` channel with the comment "Spamming is not allowed".
-```
-### SET OF TESTS :
-```c++
-/KICK #testchannel UserA:✅
-/KICK #testchannel UserA "Violation of rules":✅
-/KICK #testchannel NonExistentUser:✅
-/KICK #testchannel USERA,USERB,NonExistentUser,USERC:✅
-/KICK #chennel1,#chennel2,#chennel3 user1,user2,user3:✅
-```
-# MODE COMMAND:
-
-The `MODE` command is used to change or view the modes of a channel or a user. The specific modes vary, but common channel modes include `i`, `t`, `k`, `o`, and `l`.
-### EXAMPLES:
-```c++
-/MODE <channel> <mode> [<mode parameters>]
-/MODE <user> <mode> [<mode parameters>]
-```
-**Channel Modes and Examples:**
-
-- `i` (Invite-only channel): Only users who are invited can join the channel.
-```c++
-/MODE #privatechannel +i
-```
-* `t` (Topic settable by channel operator only): Only channel operators can change the topic.
-```c++
-/MODE #discussion +t
-```
-* `k` (Channel key/password): Requires a password to join the channel.
-```c++
-/MODE #securechannel +k secretpass
-```
-* `o` (Channel operator status): Grants or removes operator status to/from a user.
-```c++
-/MODE #chatroom +o JohnDoe
-```
-* `l` (User limit): Sets a limit on the number of users in the channel.
-```c++
-/MODE #limitedchannel +l 50
-```
-
-### SET OF TESTS:
-```c++
-1. /MODE #testchannel +i: ✅ // Set #testchannel to invite-only mode
-2. /MODE #testchannel -i: ✅  // Remove invite-only mode from #testchannel
-3. /MODE #testchannel +t: ✅  // Set #testchannel to topic settable by operators only
-4. /MODE #testchannel -t: ✅  // Allow any user to change the topic in #testchannel
-5. /MODE #testchannel +k secretkey:✅  // Set a password (secretkey) to join #testchannel
-6. /MODE #testchannel -k:✅  // Remove the password requirement from #testchannel
-7. /MODE #testchannel +o OperatorUser: ❌  // Give operator status to OperatorUser in #testchannel
-8. /MODE #testchannel -o OperatorUser: ❌  // Remove operator status from OperatorUser in #testchannel
-11. /MODE #testchannel +l 50:❌   // Set the user limit of #testchannel to 50
-12. /MODE #testchannel -l:❌   // Remove the user limit from #testchannel
-```
-
-
-### NOTES : 
-```c++
-
-**makram**
-
--- the topic and invite only restrection works but handle the below cases
-
---> when a member of a channel enters "MODE #channel"
-the server should return the modes of that channel 
---> when a member of a channel enters "TOPIC #channel"
-should receive the topic of that channel
---> they're is a pronleme when you set a normal user to be an operator you have to return a valid response for limechat to change it's color to orange in the operator list
---> segfault when you set a user to opertator and take it off and then assign it again to operator (🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴)
-
--->you have to handle when the user enteres a limite for the channel but it's a number already filled in that channel
-
--->invite has a probleme when i set the channel as invite only and i invite a user it does not work because he cannot join that channel for some reason (the members(non operators) have to be able to invite users)
-
-
-**kaoutar**
---> handle password check in sign in (🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴)
---> the user should run no command until he is registered properly
---> check the nickname change too it should take the last one place
--->
-```
-
-
-# TOPIC COMMAND:
-The `TOPIC` command is used to set or view the topic of a channel.
-```c++
-/TOPIC <channel> [<new topic>]
-```
-
-### EXAMPLES:
-```C++
-/TOPIC #discussion "Today's topic is Open Source Software"
-```
-
-
-# INVITE COMMAND:
-The `INVITE` command is used to invite a user to a channel. This is often used when the channel is set to invite-only mode.
-```c++
-/INVITE <user> <channel>
-```
-
-### EXAMPLES :
-```c++
-/INVITE JaneDoe #privatechannel
-```
-
-
-### SET OF TESTS:
-```C++
-1. /MODE #testchannel +i:  // Set #testchannel to invite-only mode
-   /INVITE UserA #testchannel:  // Invite UserA to #testchannel
-
-2. /MODE #testchannel -i:  // Remove invite-only mode from #testchannel
-   /INVITE UserB #testchannel:  // Invite UserB to #testchannel (channel is now public)
-
-7. /MODE #testchannel +o OperatorUser:  // Give operator status to OperatorUser in #testchannel
-   /INVITE UserG #testchannel:  // OperatorUser invites UserG to #testchannel
-
-8. /MODE #testchannel -o OperatorUser:  // Remove operator status from OperatorUser in #testchannel
-   /INVITE UserH #testchannel:  // Invite UserH to #testchannel (by a non-operator)
-
-9. /MODE #testchannel +l 50:  // Set the user limit of #testchannel to 50
-   /INVITE UserI #testchannel:  // Invite UserI to #testchannel (assuming the limit is not reached)
-
-10. /MODE #testchannel -l:  // Remove the user limit from #testchannel
-    /INVITE UserJ #testchannel:  // Invite UserJ to #testchannel
-```
-
-
+## New:
+Private message command send two messages for the same client.
