@@ -13,5 +13,5 @@ void Quit::run(Client* client, std::list<std::string> args) {
     for (std::list<std::string>::iterator it = args.begin(); it != args.end();it++) {
         message += *it + " ";
     }
-    server->quitUser(client, message, this->server);
+    server->quitUser(client, message, this->server, true);
 }

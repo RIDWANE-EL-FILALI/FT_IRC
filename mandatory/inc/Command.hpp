@@ -37,8 +37,6 @@ class Pass : public Command{
         void run(Client* client, std::list<std::string> args);
 };
 
-//channel
-
 class Join : public Command{
     public:
         Join(Server *server);

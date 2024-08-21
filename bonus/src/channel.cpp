@@ -4,7 +4,8 @@
 channel::channel() {
 
 }
-channel::channel(Client *client, std::string name, std::string key, std::string topic) : name(name), key(key), topic(topic), inviteOnly(false), userLimit(-1), topicRestricted(false){
+channel::channel(Client *client, std::string name, std::string key, std::string topic) : name(name), topic(topic), key(key), inviteOnly(false), topicRestricted(false), userLimit(-1)
+{
     creator = client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
     creationTime = std::time(nullptr);
     addMember(client->getNickname(), client);
@@ -14,7 +15,7 @@ channel::~channel() {
 
 }
 
-// setters and getters
+
 
 void channel::setKey(std::string key) {
     this->key = key;
@@ -81,20 +82,25 @@ bool channel::isMember(std::string name) {
     return false;
 }
 
-bool channel::isOperator(std::string name) {
-    for (std::vector<std::string>::iterator it = operators.begin(); it != operators.end();it++)
-    {
-        if (*it == name)
-            return true;
-    }
-    return false;
+bool channel::isOperator(std::string name) 
+{
+	for (std::vector<std::string>::iterator it = operators.begin(); it != operators.end();it++)
+	{
+		if (*it == name)
+			return (true);
+	}
+	return (false);
 }
 
-void channel::addMember(std::string name, Client *client) {
+bool channel::addMember(std::string name, Client *client) {
     if (isMember(name) == true)
+	{
         client->reply(Replies::ERR_ALREADYINCHANNEL(client->getNickname()));
+		return (false);
+	}
     else
         members.insert(std::make_pair(client->getNickname(), client));
+	return (true);
 }
 
 std::string channel::getChannelName()
@@ -102,14 +108,15 @@ std::string channel::getChannelName()
 	return (this->name);
 }
 
-bool channel::addOperator(std::string name, Client *client) {
-    if (!isOperator(name))
+bool channel::addOperator(std::string name, Client *client) 
+{
+	if (!isOperator(name))
 	{
-       operators.push_back(name);
-	   return (true);
+		operators.push_back(name);
+		return (true);
 	}
-    else
-        client->reply(Replies::ERR_ALREADYOPERATOR(name));
+	else
+		client->reply(Replies::ERR_ALREADYOPERATOR(name));
 	return (false);
 }
 
@@ -144,7 +151,7 @@ void channel::addInvite(Client *client, Client *invitedClient)
 			invitedMembers.push_back(invitedClient->getNickname());
 			invitedClient->addInvitingChannel(this);
 			client->reply(Replies::RPL_INVITING(this->name, client, invitedClient, 1));
-			invitedClient->reply(Replies::RPL_INVITING(this->name, invitedClient, invitedClient, 0));
+			invitedClient->reply(Replies::RPL_INVITING(this->name, client, invitedClient, 0));
 		}
 		else
 		{
@@ -207,4 +214,47 @@ std::string channel::getSetTopicSetter(std::string topicSetter)
 		this->topicSetter = topicSetter;
 		return (this->topicSetter);
 	}
+}
+
+void channel::delete_invited_member(std::string name) {
+    std::vector<std::string>::iterator it = std::find(this->invitedMembers.begin(), this->invitedMembers.end(), name);
+    if (it != this->invitedMembers.end()) {
+        this->invitedMembers.erase(it);
+    }
+}
+
+void channel::updateNick(Client *client, std::string new_nick) {
+    
+    std::map<std::string, Client*>::iterator it = members.find(client->getNickname());
+    if (it != members.end()) {
+        Client* clientPtr = it->second;
+        members.erase(it);
+        members[new_nick] = clientPtr;
+		this->broadcastReply(":" + client->getNickname() + " NICK " + new_nick);
+    }
+
+    
+    for (std::vector<std::string>::iterator it = operators.begin(); it != operators.end(); ++it) {
+        if (*it == client->getNickname()) {
+            *it = new_nick;
+        }
+    }
+
+    
+    for (std::vector<std::string>::iterator it = invitedMembers.begin(); it != invitedMembers.end(); ++it) {
+        if (*it == client->getNickname()) {
+            *it = new_nick;
+        }
+    }
+
+    
+    if (topicSetter == client->getNickname()) {
+        topicSetter = new_nick;
+    }
+
+    
+    std::string new_creator = client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname();
+    if (new_creator == this->getCreator()) {
+        this->creator = new_nick + "!" + client->getUsername() + "@" + client->getHostname();
+    }
 }

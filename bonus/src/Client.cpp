@@ -17,7 +17,7 @@ void Client::welcomeToServer()
 
 int Client::getState() const
 {
-    return (this->state == UNKNOWN);
+    return (this->state);
 }
 
 void Client::setState(ClientState state)
@@ -98,4 +98,20 @@ channel* Client::getInvitingChannel(std::string channelName)
 		}
 	}
 	return (NULL);
+}
+
+void Client::delete_invited_channel(channel *Channel) 
+{
+	std::vector<channel*>::iterator it = std::find(this->invitingChannels.begin(), this->invitingChannels.end(), Channel);
+	if (it != this->invitingChannels.end()) {
+		this->invitingChannels.erase(it);
+	}
+}
+
+std::string& Client::getBuffer() {
+    return buffer;
+}
+
+void Client::setBuffer(const std::string& newBuffer) {
+    buffer = newBuffer;
 }

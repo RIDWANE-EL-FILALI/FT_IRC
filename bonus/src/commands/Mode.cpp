@@ -50,15 +50,10 @@ void Mode::run(Client *client, std::list<std::string> args)
 			client->reply(Replies::ERR_NOTONCHANNEL(client->getNickname(), channelName));
 			return ;
 		}
-		if (!Channel->isOperator(client->getNickname()))
-		{
-			client->reply(Replies::ERR_CHANOPRIVSNEEDED(channelName, client->getNickname()));
-			return ;
-		}
 		args.pop_front();
 		if (args.empty())
 		{
-			server->replyChannelModIs(channelName, client, modeArgument);
+			server->replyChannelModIs(channelName, client);
 			return ;
 		}
 	}
@@ -71,6 +66,11 @@ void Mode::run(Client *client, std::list<std::string> args)
 		adding = args.front()[0] != '-';
 		modeReply += (adding ? "+" : "-");
 		modeString = args.front();
+		if (modeString.length() <= 1)
+		{
+			client->reply(Replies::ERR_NEEDMOREPARAMS(modeString));
+			return;
+		}
 		args.pop_front();
 	}
 	for (int i = 1; modeString[i]; i++)
@@ -103,7 +103,7 @@ void Mode::run(Client *client, std::list<std::string> args)
 					client->reply(Replies::ERR_NEEDMOREPARAMS("MODE"));
 					return ;
 				}
-				else if (server->setPasswordChannel(channelName, adding, adding ? args.front() : "", client))
+				else if (server->setPasswordChannel(channelName, adding ? args.front() : "", client))
 				{
 					if (adding)
 					{
@@ -135,6 +135,11 @@ void Mode::run(Client *client, std::list<std::string> args)
 			}
 			case 'o':
 			{
+				if (changedModes['o'] == true)
+				{
+					std::cout << "I allow one user at a time!\n";
+					break ;
+				}
 				if (args.empty())
 				{
 					client->reply(Replies::ERR_NEEDMOREPARAMS("MODE"));
@@ -156,6 +161,8 @@ void Mode::run(Client *client, std::list<std::string> args)
 				return ;
 			}
 		}
+		if (!adding)
+			break ;
 	}
 	for (std::map<char, bool>::iterator change = changedModes.begin(); change != changedModes.end(); change++)
 	{
@@ -164,12 +171,18 @@ void Mode::run(Client *client, std::list<std::string> args)
 			modeReply += change->first;
 		}
 	}
-	for (int i = 0; modeReply[i]; ++i)
+	int space_cord = 0;
+	while (modeReply[space_cord] && modeReply[space_cord] != ' ')
+		space_cord++;
+	for (int i = 0; i < (int)modeReply.size() && i < space_cord; i++)
 	{
 		if ((modeReply[i] == 'k' || modeReply[i] == 'l') && adding)
 			modeReply += " " + modeArgument[modeReply[i]];
 		if (modeReply[i] == 'o')
+		{
 			modeReply += " " + modeArgument[modeReply[i]];
+			break ;
+		}
 	}
-	server->broadcastArgsReply(channelName, modeReply, client);
+	server->broadcastArgsReply(channelName, modeReply);
 }

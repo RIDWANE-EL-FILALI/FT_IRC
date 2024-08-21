@@ -12,11 +12,11 @@ void Weather::run(Client* client, std::list<std::string> args) {
         client->reply(Replies::ERR_NEEDMOREPARAMS("WEATHER"));
         return;
     }
-    if (args.size() > 1)
-    {
-        client->reply(Replies::ERR_NEEDMOREPARAMS("WEATHER"));
-        return;
-    }
+	if (args.size() > 1) 
+	{
+		client->reply(Replies::ERR_TOOMANYARGUMENTS("WEATHER"));
+		return;
+	}
 
     std::string city = args.front();
     Client *c = server->getClientByNickname("bot");
@@ -25,7 +25,7 @@ void Weather::run(Client* client, std::list<std::string> args) {
         c->reply("WEATHER " + client->getNickname() + " " + city);
     }
     else
-        client->reply("The bot is not connected.");
+        client->reply(Replies::RPL_BOTNOTREGISTERED());
     return ;
 }
     

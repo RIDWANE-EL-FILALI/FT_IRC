@@ -50,7 +50,7 @@ void Kick::run(Client* client, std::list<std::string> args) {
         std::string channelName = *channelIter;
 
         if (channelName.empty() || channelName[0] != '#') {
-            client->reply(Replies::ERR_BADCHANMASK("JOIN"));
+            client->reply(Replies::ERR_BADCHANMASK("KICK"));
             continue;
         }
         if (userList.empty())

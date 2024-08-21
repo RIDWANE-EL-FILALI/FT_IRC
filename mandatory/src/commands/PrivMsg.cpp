@@ -26,13 +26,9 @@
 			channelList.push_back(item);
 		}
 		std::string message;
-		for (std::list<std::string>::iterator it = args.begin(); it != args.end(); ++it) {
-			if (!it->empty() && (*it)[0] == ':') {
-				*it = it->substr(1);
-			}
+		for (std::list<std::string>::iterator it = args.begin(); it != args.end(); ++it)
 			message += " " + *it;
-		}
-		std::cout << "Message: " << message << std::endl;
+		message.erase(0, message.find_first_not_of(' '));
 		for (std::list<std::string>::iterator channelIter = channelList.begin(); channelIter != channelList.end(); ++channelIter) {
 			std::string channelName = *channelIter;
 

@@ -8,7 +8,8 @@ class channel;
 enum ClientState{
     UNREGISTERED,
     REGISTERED,
-    AUTHENTICATED,
+    NICK,
+    NONICK,
     AWAY,
     OPERATOR,
     UNKNOWN
@@ -23,7 +24,8 @@ class Client{
         int port;
         int fd;
         ClientState state;
-		std::vector<channel*>	invitingChannels; // the channels that invited the client (used in invite command)
+		std::vector<channel*>	invitingChannels;
+        std::string buffer;
 
     public:
         Client(std::string hostname, int port, int fd);
@@ -49,6 +51,9 @@ class Client{
 		std::vector<channel*>	getInvitingChannels();
 		channel*				getInvitingChannel(std::string channelName);
 		void					addInvitingChannel(channel *Channel);
+		void 					delete_invited_channel(channel *Channel);
+        std::string& getBuffer();
+        void setBuffer(const std::string& newBuffer);
 };
 
 #endif

@@ -47,7 +47,7 @@ void Invite::run(Client* client, std::list<std::string> args)
 		channelName = args.front();
 		if ((Channel = server->getChannel(channelName)) == NULL)
 		{
-			client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+			client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
 			return ;
 		}
 		args.pop_front();

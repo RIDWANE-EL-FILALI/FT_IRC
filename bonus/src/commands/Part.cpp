@@ -38,6 +38,6 @@ void Part::run(Client* client, std::list<std::string> args) {
             client->reply(Replies::ERR_BADCHANMASK("PART"));
             continue;
         }
-        server->partUser(channelName, client, this->server, comment);
+        server->partUser(channelName, client, this->server, comment, true);
     }
 }

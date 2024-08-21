@@ -46,7 +46,7 @@ void Join::run(Client* client, std::list<std::string> args) {
     for (std::list<std::string>::iterator channelIter = channelList.begin(); channelIter != channelList.end(); ++channelIter) {
         std::string channelName = *channelIter;
 
-        if (channelName.empty() || channelName[0] != '#') {
+        if (channelName.empty() || channelName[0] != '#' || channelName == "#") {
             client->reply(Replies::ERR_BADCHANMASK("JOIN"));
             continue;
         }

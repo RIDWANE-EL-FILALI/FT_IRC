@@ -1,6 +1,7 @@
-CPPFLAGS =  -std=c++98
+CPPFLAGS =  -std=c++98 -Wall -Wextra -Werror
 CC = g++
 NAME = ircserv
+BOT_NAME = Weather_bot
 PREFIX = ./obj/
 ASCII = \n\
 ██╗██████╗  ██████╗███████╗███████╗██████╗ ██╗   ██╗\n\
@@ -34,7 +35,8 @@ HEADERS = inc/Client.hpp \
           inc/Command.hpp \
           inc/CommandHandler.hpp \
           inc/Replies.hpp \
-          inc/Server.hpp
+          inc/Server.hpp \
+		  inc/ip_address.hpp
 
 OBJECT = $(addprefix $(PREFIX), $(SOURCE:.cpp=.o))
 
@@ -61,12 +63,10 @@ $(NAME): $(PREFIX) $(OBJECT)
 $(PREFIX)%.o: %.cpp $(HEADERS)
 	@$(CC) $(CPPFLAGS) -c $< -o $@
 
-run_irc:
-	@./$(NAME) 9001 Pass
 clean:
 	@echo "$(COLOR)Cleaning...$(RESET)"
 	@rm -rf $(PREFIX)
-	@rm -f $(OBJECT) 
+	@rm -f $(OBJECT)
 	@echo "$(COLOR)Clean complete ✅$(RESET)"
 
 fclean: clean

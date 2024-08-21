@@ -8,14 +8,13 @@ class Command;
 
 class CommandHandler{
     private:
-        Server *server;
         std::map<std::string, Command *> _commands;
-
     public:
         CommandHandler(Server *server);
         ~CommandHandler();
 
         Command *getCommand(std::string command);
+        void capitalize(std::string &str);
 
         void handleCommand(std::string command, Client *client);
 };

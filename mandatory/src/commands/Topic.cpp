@@ -14,9 +14,9 @@ void Topic::run(Client* client, std::list<std::string> args)
 {
 	channel*	Channel;
 	std::string	Topic;
-	time_t		setTime = 0;
+	static time_t	setTime = 0;
 
-	if (args.empty() || *args.begin() == "TOPIC")
+	if (args.empty() || *args.begin() == "TOPIC" || *args.begin() == ":")
 	{
 		client->reply(Replies::ERR_NEEDMOREPARAMS("TOPIC"));
 		return ;
@@ -24,7 +24,7 @@ void Topic::run(Client* client, std::list<std::string> args)
 	Channel = server->getChannel(args.front());
 	if (Channel == NULL)
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(args.front()));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), args.front()));
 		return ;
 	}
 	args.pop_front();
@@ -34,7 +34,7 @@ void Topic::run(Client* client, std::list<std::string> args)
 		Channel->getChannelName()));
 		return ;
 	}
-	if (Channel->getTopicRestricted() && !Channel->isOperator(client->getNickname()))
+	if (Channel->getTopicRestricted() && !Channel->isOperator(client->getNickname()) && !args.empty())
 	{
 		client->reply(Replies::ERR_CHANOPRIVSNEEDED(Channel->getChannelName(),
 		client->getNickname()));
@@ -44,8 +44,10 @@ void Topic::run(Client* client, std::list<std::string> args)
 	{
 		client->reply(Replies::RPL_TOPIC(client->getNickname(), Channel->getChannelName(), Channel->getTopic()));
 		if (Channel->getTopic() != "")
+		{
 			client->reply(Replies::RPL_TOPICWHOTIME(client->getNickname(), Channel->getChannelName()
 		, Channel->getSetTopicSetter(""), setTime));
+		}
 		return ;
 	}
 	if (args.front()[0] == ':')
@@ -65,7 +67,7 @@ void Topic::run(Client* client, std::list<std::string> args)
 	}
 	{
 		Channel->setTopic(Topic);
-		setTime = std::time(nullptr);
+		setTime = std::time(NULL);
 		Channel->getSetTopicSetter(client->getNickname());
 		Channel->broadcastReply(Replies::RPL_TOPIC(client->getNickname(),
 		Channel->getChannelName(), Channel->getTopic()));

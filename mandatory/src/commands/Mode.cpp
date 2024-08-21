@@ -42,7 +42,7 @@ void Mode::run(Client *client, std::list<std::string> args)
 		Channel = server->getChannel(args.front());
 		if (!Channel)
 		{
-			client->reply(Replies::ERR_NOSUCHCHANNEL(channelName));
+			client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), channelName));
 			return ;
 		}
 		if (!Channel->isMember(client->getNickname()))
@@ -50,27 +50,27 @@ void Mode::run(Client *client, std::list<std::string> args)
 			client->reply(Replies::ERR_NOTONCHANNEL(client->getNickname(), channelName));
 			return ;
 		}
-		if (!Channel->isOperator(client->getNickname()))
-		{
-			client->reply(Replies::ERR_CHANOPRIVSNEEDED(channelName, client->getNickname()));
-			return ;
-		}
 		args.pop_front();
 		if (args.empty())
 		{
-			server->replyChannelModIs(channelName, client, modeArgument);
+			server->replyChannelModIs(channelName, client);
 			return ;
 		}
 	}
 	else
 	{
-		client->reply(Replies::ERR_NOSUCHCHANNEL(args.front()));
+		client->reply(Replies::ERR_NOSUCHCHANNEL(client->getNickname(), args.front()));
 		return ;
 	}
 	{
 		adding = args.front()[0] != '-';
 		modeReply += (adding ? "+" : "-");
 		modeString = args.front();
+		if (modeString == "+" || modeString == "-")
+		{
+			client->reply(Replies::ERR_NEEDMOREPARAMS(modeReply));
+			return;
+		}
 		args.pop_front();
 	}
 	for (int i = 1; modeString[i]; i++)
@@ -103,7 +103,7 @@ void Mode::run(Client *client, std::list<std::string> args)
 					client->reply(Replies::ERR_NEEDMOREPARAMS("MODE"));
 					return ;
 				}
-				else if (server->setPasswordChannel(channelName, adding, adding ? args.front() : "", client))
+				else if (server->setPasswordChannel(channelName, adding ? args.front() : "", client))
 				{
 					if (adding)
 					{
@@ -152,10 +152,12 @@ void Mode::run(Client *client, std::list<std::string> args)
 			}
 			default :
 			{
-				client->reply(Replies::ERR_UNKNOWNMODE(mode));
+				client->reply(Replies::ERR_UNKNOWNMODE(client, mode));
 				return ;
 			}
 		}
+		if (!adding)
+			break ;
 	}
 	for (std::map<char, bool>::iterator change = changedModes.begin(); change != changedModes.end(); change++)
 	{
@@ -164,12 +166,18 @@ void Mode::run(Client *client, std::list<std::string> args)
 			modeReply += change->first;
 		}
 	}
-	for (int i = 0; modeReply[i]; ++i)
+	int space_cord = 0;
+	while (modeReply[space_cord] && modeReply[space_cord] != ' ')
+		space_cord++;
+	for (int i = 0; i < (int)modeReply.size() && i < space_cord; i++)
 	{
 		if ((modeReply[i] == 'k' || modeReply[i] == 'l') && adding)
 			modeReply += " " + modeArgument[modeReply[i]];
 		if (modeReply[i] == 'o')
+		{
 			modeReply += " " + modeArgument[modeReply[i]];
+			break ;
+		}
 	}
-	server->broadcastArgsReply(channelName, modeReply, client);
+	server->broadcastArgsReply(channelName, modeReply);
 }

@@ -9,14 +9,17 @@ Nick::~Nick() {
 }
 
 void Nick::run(Client* client, std::list<std::string> args) {
-    if (client->getState() == REGISTERED) {
-        std::cout << "Already registered\n";
-        client->reply(Replies::ERR_ALREADYREGISTERED());
-        return;
+    if (args.size() < 1)
+    {
+        std::cout << "args size: " << args.size() << std::endl;
+        client->reply(Replies::ERR_NEEDMOREPARAMS("NICK"));
+        return ;
     }
 
-    if (args.size() < 1)
-        client->reply(Replies::ERR_NEEDMOREPARAMS("NICK"));
+    if (client->getState() == UNREGISTERED) {
+        client->reply(Replies::ERR_NOTREGISTERED());
+        return;
+    }
 
     std::string nickname = args.front();
     if (nickname.length() < 1 || nickname.length() > 9) {
@@ -29,5 +32,9 @@ void Nick::run(Client* client, std::list<std::string> args) {
         return;
     }
 
+    server->updateNickname(client, nickname);
     client->setNickname(nickname);
+    if (client->getState() != REGISTERED) {
+        client->setState(NICK);
+    }
 }

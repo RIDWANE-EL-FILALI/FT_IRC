@@ -1,4 +1,4 @@
-CPPFLAGS =  -std=c++98
+CPPFLAGS =  -std=c++98 -Wall -Wextra -Werror
 CC = g++
 NAME = ircserv
 BOT_NAME = Weather_bot
@@ -36,7 +36,8 @@ HEADERS = inc/Client.hpp \
           inc/Command.hpp \
           inc/CommandHandler.hpp \
           inc/Replies.hpp \
-          inc/Server.hpp
+          inc/Server.hpp \
+		  inc/ip_address.hpp
 
 OBJECT = $(addprefix $(PREFIX), $(SOURCE:.cpp=.o))
 BOT_SOURCE = bot/main.cpp
@@ -74,12 +75,6 @@ $(PREFIX)%.o: %.cpp $(HEADERS)
 $(PREFIX)bot/%.o: bot/%.cpp $(HEADERS)
 	@mkdir -p $(@D)
 	@$(CC) $(CPPFLAGS) -c $< -o $@
-
-run_irc:
-	@./$(NAME) 9001 Pass
-
-run_bot:
-	@./$(BOT_NAME) localhost 9001 Pass
 
 clean:
 	@echo "$(COLOR)Cleaning...$(RESET)"

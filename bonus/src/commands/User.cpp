@@ -14,8 +14,20 @@ void User::run(Client* client, std::list<std::string> args) {
         return;
     }
 
-    if (args.size() < 4)
+    if (args.size() < 4) {
         client->reply(Replies::ERR_NEEDMOREPARAMS("USER"));
+        return ;
+    }
+
+    if (client->getState() == UNREGISTERED) {
+        client->reply(Replies::ERR_NOTREGISTERED());
+        return;
+    }
+
+    if (client->getState() == NONICK) {
+        client->reply(Replies::ERR_NONICKNAME());
+        return;
+    }
     
     std::string username = args.front();
     args.pop_front();
@@ -25,9 +37,7 @@ void User::run(Client* client, std::list<std::string> args) {
     args.pop_front();
     std::string realname = args.front();
     args.pop_front();
-
     client->setUsername(username);
-    // client->setMode(mode);
     client->setRealname(realname);
     client->setState(REGISTERED);
     client->welcomeToServer();
